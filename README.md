@@ -54,9 +54,12 @@ print(np.array([1,2,3])**2)
 
 我最喜欢的环境管理工具是conda
 
-“ **01** 环境搭建的截图 ” <img src="image/2.png" width="800" />
+“ **01** 环境搭建的截图 ” 
+
+<img src="image/2.png" width="800" />
 
 “ **02** 环境搭建的截图 ”
+
 
 <img src="image/3.png" width="800" />
 
