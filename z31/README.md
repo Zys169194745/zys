@@ -63,21 +63,24 @@ feature_type = 'freq'  # 使用高频词特征
 ### 代码运行截图
 `classify.py`
 
-<img src="image/1.png" weight="800" alt="classify.py截图">
+<img width="722" alt="10149287e0a5cd1cd48728426f37491" src="https://github.com/user-attachments/assets/d708ae5b-5d3a-4140-a7f2-85a3f03fe9b5" />
+
 
 `TF-IDF.py`
 
-<img src="image/2.png" weight="800" alt="classify_TF.py截图">
+<img width="704" alt="b2507a768bbe2df574f36d3e351778d" src="https://github.com/user-attachments/assets/b529bc66-5afd-4906-a9cd-a1fc719736c1" />
+
 
 
 
 ### 样本平衡处理
 `imblearn-classify.py`
 
-<img src="image/3.png" weight="800" alt="classify_Hint.py截图">
+<img width="666" alt="e2e7d6e3cc88a26407690df43c0b6fe" src="https://github.com/user-attachments/assets/c298407e-5b6a-49e7-8e79-94bb5d58382a" />
+
 
 ### 增加模型评估指标
 `classification.py`
+<img width="679" alt="7f986962763d4a2c68076065d936b0b" src="https://github.com/user-attachments/assets/c7585173-a87a-458d-ac31-82b2c773bb3d" />
 
-<img src="image/4.png" weight="800" alt="classify_Hint.py截图">
 
