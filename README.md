@@ -55,13 +55,15 @@ print(np.array([1,2,3])**2)
 我最喜欢的环境管理工具是conda
 
 “ **01** 环境搭建的截图 ” 
+<img width="467" alt="4f62e0f70bd97c647e5a6628c738aa3" src="https://github.com/user-attachments/assets/d6997d20-dcd3-411c-aac0-bde13606349f" />
 
-<img src="image/2.png" width="800" />
+
 
 “ **02** 环境搭建的截图 ”
+<img width="448" alt="b5a64fa1ca37d37b046d1578a2c4e00" src="https://github.com/user-attachments/assets/6ccf44c3-eb83-4fc1-9932-cdf8bd2d5abe" />
 
 
-<img src="image/3.png" width="800" />
+
 
 
 
