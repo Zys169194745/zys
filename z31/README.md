@@ -1,86 +1,83 @@
-# 文本分类项目
+# 代码核心功能说明
+## 算法基础
+该仓库采用多项式朴素贝叶斯分类器,其基于条件概率的特征独立性假设为：
+1. 特征条件独立性：假设所有特征（如单词）在给定类别下相互独立
+2. 多项式分布：适用于离散型特征（如词频或TF-IDF值），建模特征出现的次数
+***
+贝叶斯定理在邮件分类中的具体应用形式为：
+1. 对于邮件分类（垃圾/普通），算法计算后验概率：P(类别∣特征)∝P(类别)⋅ ∏ P(特征i∣类别)
+2. 先验概率P(类别)：通过训练数据中各类别的比例计算（如垃圾邮件占比127/151）
+3. 似然概率P(类别∣特征)：统计每个词在各类别中的出现频率（平滑处理避免零概率）
+***
+邮件分类中的具体应用:
+1. 输入：邮件的词频向量（如[0, 2, 1, ...]表示各特征词的出现次数）
+2. 输出：选择使后验概率最大的类别（`argmax P(类别|特征)`）
+## 数据处理流程
+分词处理:
+1. 使用`jieba.cut()`对中文文本分词（如将`"自然语言处理"`切分为`["自然", "语言", "处理"]`）
+2. 过滤单字词（`len(word) > 1`），减少噪声特征。
+***
+停用词与无效字符过滤:
+1. 正则表达式清洗
+   + `re.sub(r'[.【】0-9、——。，！~\*]', '', text)  # 移除标点符号和数字`
+2. 停用词处理
+   + 代码中未显式定义停用词表，但通过长度过滤（`len(word) > 1`）隐式去除了部分无意义词;若需增强效果，可添加自定义停用词表（如`stop_words = ["的", "是", ...]`）
+***
+文本标准化:
++ 分词后使用空格拼接（`' '.join(words)`），以满足`TfidfVectorizer`的输入格式要求
+## 特征构建过程
+高频词特征选择:
+1. 数学表达
+   + 对每个文档d，生成词频向量x，其中`xi=count(wi)`（词wi的出现次数）
+2. 实现差异
+   + 手动统计词频（`Counter + map`），选择前`top_num`高频词
+   + 特征值为原始计数，未考虑词的全局重要性
+***
+TF-IDF加权特征：
+1. 数学表达
 
-本项目实现了一个基于多项式朴素贝叶斯分类器的文本分类系统，支持高频词特征和TF-IDF加权特征两种特征选择模式。通过参数化切换机制，用户可以根据需求灵活选择特征提取方式。
-
-## 代码核心功能说明
-
-### 算法基础
-本项目采用**多项式朴素贝叶斯分类器**（Multinomial Naive Bayes），其核心思想是基于贝叶斯定理和条件概率的特征独立性假设。
-
-- **贝叶斯定理**：在邮件分类中，贝叶斯定理用于计算给定邮件内容条件下邮件属于某一类别的概率。具体形式为：
-  
-  $$P(y|x) = \frac{P(x|y) \cdot P(y)}{P(x)}$$
-  
-  其中：
-  - $P(y|x)$是邮件内容 $x$ 属于类别 $y$ 的后验概率。
-  - $P(x|y)$ 是类别 $y$ 下邮件内容 $x$ 的似然概率。
-  - $P(y)$ 是类别 $y$ 的先验概率。
-  - $P(x)$ 是邮件内容 $x$ 的边际概率。
-
-- **特征独立性假设**：多项式朴素贝叶斯假设邮件中的每个词（特征）是相互独立的，即：
-  
-  $$P(x|y) = \prod_{i=1}^{n} P(x_i|y)$$
-  
-  其中 $x_i$ 表示邮件中的第 $i$ 个词。
-
-### 数据处理流程
-1. **分词处理**：使用 `jieba` 库对文本内容进行分词，将文本切分为独立的词语。
-2. **停用词过滤**：通过正则表达式过滤无效字符（如标点符号、数字等），并去除长度为1的词。
-3. **文本清理**：去除无关字符，保留有效词语，确保数据质量。
-
-### 特征构建过程
-本项目支持两种特征提取方式：
-1. **高频词特征选择**：
-   - 统计所有文本中出现频率最高的词，构建词频向量。
-   - 数学表达形式：对每个文本，统计高频词在文本中的出现次数，形成特征向量。
-   - 实现方式：使用 `collections.Counter` 统计词频，选择前 `top_num` 个高频词。
-
-2. **TF-IDF加权特征**：
-   - 计算每个词的TF-IDF值，衡量词在文本中的重要性。
-   - 数学表达形式：
-     
-        $$\text{TF-IDF}(t, d) = \mathrm{TF}(t, d) \times \mathrm{IDF}(t)$$
-        
-        其中：
-        - $\mathrm{TF}(t, d)$ 是词 $t$ 在邮件 $d$ 中的词频。
-        - $\mathrm{IDF}(t)$ 是词 $t$ 的逆文档频率，计算公式为：
-          
-          $$\mathrm{IDF}(t) = \log \frac{N}{1 + \mathrm{DF}(t)}$$
-          
-          其中 $N$ 是总邮件数， $\mathrm{DF}(t)$ 是包含词 $t$ 的邮件数。
-    - 实现方式：使用 `sklearn.feature_extraction.text.TfidfVectorizer` 计算TF-IDF值。
-
-### 高频词/TF-IDF两种特征模式的切换方法
-在代码中，通过设置 `feature_type` 参数选择特征提取方式：
-- 设置为 `'freq'` 时，使用高频词特征。
-- 设置为 `'tfidf'` 时，使用TF-IDF加权特征。
-
-示例：
-```python
-feature_type = 'freq'  # 使用高频词特征
-# feature_type = 'tfidf'  # 使用TF-IDF加权特征
-```
-### 代码运行截图
-`classify.py`
-
-<img width="722" alt="10149287e0a5cd1cd48728426f37491" src="https://github.com/user-attachments/assets/d708ae5b-5d3a-4140-a7f2-85a3f03fe9b5" />
-
-
-`TF-IDF.py`
-
-<img width="704" alt="b2507a768bbe2df574f36d3e351778d" src="https://github.com/user-attachments/assets/b529bc66-5afd-4906-a9cd-a1fc719736c1" />
-
-
-
-
-### 样本平衡处理
-`imblearn-classify.py`
-
-<img width="666" alt="e2e7d6e3cc88a26407690df43c0b6fe" src="https://github.com/user-attachments/assets/c298407e-5b6a-49e7-8e79-94bb5d58382a" />
-
-
-### 增加模型评估指标
-`classification.py`
-<img width="679" alt="7f986962763d4a2c68076065d936b0b" src="https://github.com/user-attachments/assets/c7585173-a87a-458d-ac31-82b2c773bb3d" />
-
-
+$$
+\text{TF-IDF}(w, d) = \text{TF}(w, d) \times \log\left(\frac{N}{\text{DF}(w)}\right)
+$$
+   + TF(w,d)：词w在文档d中的频率
+   + DF(w)：包含词w的文档数
+2. 实现差异
+   + 使用`TfidfVectorizer`自动计算加权值，特征值为归一化后的权重
+   + 通过`max_features`限制特征维度，类似高频词截断
+## 高频词/TF-IDF两种特征模式的切换方法
+通过`extract_features(method, top_num)`函数实现切换：
+1. 高频词模式（`method='frequency'`）：
+   + `vector = [ [words.count(word) for word in top_words] for words in all_words ]`
+2. TF-IDF模式（`method='tfidf'`）：
+   + `tfidf = TfidfVectorizer(max_features=top_num)
+   vector = tfidf.fit_transform(texts).toarray()`
+# 样本平衡处理
+SMOTE过采样集成:
+1. 在模型训练前添加SMOTE过采样步骤
+2. 使用`smote.fit_resample()`生成平衡数据集
+3. 打印过采样前后的类别分布以验证效果
+***
+样本平衡验证:
++ `print("过采样前类别分布:", np.bincount(labels))  # 输出: [24 127]
+print("过采样后类别分布:", np.bincount(labels_resampled))  # 输出: [127 127]`
+***
+模型训练调整:
+1. 使用平衡后的数据(`vector_resampled, labels_resampled`)训练模型
+2. 保持预测函数不变，确保接口一致性
+# 增加模型评估指标
+新增训练测试机划分:
+1. `from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    vector, labels, test_size=0.2, random_state=42, stratify=labels)`
+2. 使用stratify参数保持原始类别比例
+3. 测试集比例为20%（可调整）
+***
+SMOTE过采样优化:
+1. 现在仅对训练集进行过采样，测试集保持原始分布
+2. 打印过采样前后的类别分布对比
+***
+分类评估报告集成:
+1. `from sklearn.metrics import classification_report
+print(classification_report(y_test, y_pred, target_names=['普通邮件', '垃圾邮件']))`
+2. 输出精度(precision)、召回率(recall)、F1值等指标
+3. 按类别（普通邮件/垃圾邮件）分别显示
